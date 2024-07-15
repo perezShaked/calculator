@@ -1,0 +1,79 @@
+
+* {
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 26px;
+  color: whitesmoke;
+}
+
+
+#calculatorBackgrownd{
+  margin:auto;
+  height: 16rem;
+  width: 9rem;
+  border-radius: 1.5rem;
+  border-color: rgb(69, 131, 172);
+  border-style: solid;
+  border-width: 1rem;
+  background-color: rgb(69, 131, 172);
+  display:flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.calculatorButton  {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 1rem;
+  border-style: none;
+  background-color: rgba(255, 255, 255, 0.162);
+  cursor: pointer;
+}
+
+.calculatorButton:hover {
+  background-color: rgba(255, 255, 255, 0.573);
+  color:rgba(69, 131, 172);
+}
+
+#equalButton{
+  background-color: rgba(241, 106, 96, 0.87);
+}
+
+#equalButton:hover{
+  background-color: rgba(236, 141, 135, 0.87);
+}
+
+.wideButtons{
+  width: 4.2rem;  
+}
+
+#inputBar{
+  font-size: 22px;
+  width: 8.5rem;
+  height: 1rem;
+  background-color: rgba(255, 255, 255, 0);
+  border-top: solid;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  border-color: rgba(24, 6, 6, 0.251);
+  outline: none;
+  padding-top: 0.5rem;
+}
+
+#showBar{
+  width: 8.5rem;
+  height: 1rem;
+  margin: 0;
+  overflow-x:auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.operatorsButtons{
+  background-color: rgba(24, 6, 6, 0.251);
+}
+
+
+
+

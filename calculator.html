@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      shaked's calculator
+    </title>
+    <link rel="stylesheet" type="text/css" href="claculator.css">
+  </head>
+  <body>
+    <div id="calculatorBackgrownd">
+        <p id="showBar"></p>
+        <input type="text" oninput="checkInputBar()" id="inputBar">
+        <button class="calculatorButton wideButtons" id="clearbutton" onclick="clearButtonClick()">C</button>
+        <button class="calculatorButton" onclick="deleteButtonClick()">←</button>
+        <button class="calculatorButton" onclick="operatorOrPointButtonClick('*')">*</button>
+        <button class="calculatorButton" onclick="numberButtonClick(7)">7</button>
+        <button class="calculatorButton" onclick="numberButtonClick(8)">8</button>
+        <button class="calculatorButton" onclick="numberButtonClick(9)">9</button>
+        <button class="calculatorButton" onclick="operatorOrPointButtonClick('/')">/</button>
+        <button class="calculatorButton" onclick="numberButtonClick(4)">4</button>
+        <button class="calculatorButton" onclick="numberButtonClick(5)">5</button>
+        <button class="calculatorButton" onclick="numberButtonClick(6)">6</button>
+        <button class="calculatorButton" onclick="operatorOrPointButtonClick('-')">-</button>
+        <button class="calculatorButton" onclick="numberButtonClick(1)">1</button>
+        <button class="calculatorButton" onclick="numberButtonClick(2)">2</button>
+        <button class="calculatorButton" onclick="numberButtonClick(3)">3</button>
+        <button class="calculatorButton" onclick="operatorOrPointButtonClick('+')">+</button>
+        <button class="calculatorButton wideButtons" onclick="numberButtonClick(0)">0</button>
+        <button class="calculatorButton" id="dotButton" onclick="operatorOrPointButtonClick('.')">.</button>
+        <button class="calculatorButton" id="equalButton" onclick="equalButtonClick()">=</button>
+    </div>
+  </body>
+  <script src="claculator.js"></script>
+</html>
