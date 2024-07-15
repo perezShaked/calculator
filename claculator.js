@@ -7,7 +7,10 @@ const calculatorButtons = document.getElementsByClassName("calculatorButton");
 let expressionArray = [];
 let equalButtonClicked = false;
 
-//React to the 'Escape' and 'Enter' key presses.
+/*React to the 'Escape' and 'Enter' key presses.
+Escape - act like the clear button
+Enter - act like the equal cutton
+*/
 document.addEventListener('keydown', (event) => {
   if(event.key === "Escape") {
     clearButtonClick();
@@ -26,19 +29,20 @@ const numberButtonClick = (buttenValue) => {
   checkInputBar();
 }
 
-//React to clicks on the clear button.
+//React to clicks on the clear button to reset the calculator.
 const clearButtonClick = () => {
   expressionArray = [];
   showBar.innerHTML = "";
   inputBar.value = "";
   equalButtonClicked = false;
-  for(let button of calculatorButtons){
-    button.disabled = false;
-  }
+  enabeledAllButtonsAndInputBar();
 }
 
 //React to clicks on the delete button.
 const deleteButtonClick = () => {
+  if(equalButtonClicked){
+    clearButtonClick(); 
+  }
   inputBar.value = inputBar.value.slice(0, -1);
 }
 
@@ -55,14 +59,14 @@ const checkInputBar = () => {
     operatorCharAdd(inputBar.value.at(-1));
   }else if(inputBar.value.at(-1) == "."){
     pointCharAdd();
-  }else if(inputBar.value.length >= 2 && !inputBar.value.includes(".")){
+  }else if(inputBar.value.length >= 1 && !inputBar.value.includes(".")){
     inputBar.value = parseFloat(inputBar.value);
   }
 }
 
 //React to operators added by buttons or keyboard.
 const operatorCharAdd = (char) => {
-  if(equalButtonClicked){
+  if(equalButtonClicked && inputBar.value.length !== 1){//Continue the expression with the result value.
     expressionArray.push(char);
     showBar.innerHTML = expressionArray[0] + char;
     inputBar.value = "";
@@ -70,13 +74,13 @@ const operatorCharAdd = (char) => {
   }else if(inputBar.value.length === 1){
     if(showBar.innerHTML.length === 0){
       inputBar.value = "";
-    }else{
+    }else{//Replace the operator in the display bar with the one that is currently selected for addition.
       expressionArray.pop();
       expressionArray.push(inputBar.value);
       showBar.innerHTML = showBar.innerHTML.slice(0, -1) + char;
       inputBar.value = "";   
     }
-  }else{
+  }else{//Add the expressiono in the input bar to the display bar.
     expressionArray.push(inputBar.value.slice(0, -1));
     expressionArray.push(char);
     showBar.innerHTML += inputBar.value;
@@ -86,6 +90,9 @@ const operatorCharAdd = (char) => {
 
 //React to point added by button or keyboard.
 const pointCharAdd = () => {
+  if(equalButtonClicked){
+    clearButtonClick(); 
+  }
   if(inputBar.value.slice(0,-1).includes(".") || inputBar.value.length === 1){
     inputBar.value = inputBar.value.slice(0, -1);
   }
@@ -119,35 +126,44 @@ const calculateExpression = () => {
     return "";
   }
 
-  for(let i = 0; i < expressionArray.length; i++){
+  for(let i = 0; i < expressionArray.length; i++){//calculate * and / 
     if(expressionArray[i] == "/" || expressionArray[i] == "*"){
       expressionArray[i - 1] = methods[expressionArray[i]](+expressionArray[i-1],+expressionArray[i+1]);
       expressionArray.splice(i,2);
       i--;
     }
   }
-  for(let i = 0; i < expressionArray.length; i++){
+  for(let i = 0; i < expressionArray.length; i++){//calculate + and -
     if(expressionArray[i] == "-" || expressionArray[i] == "+"){
       expressionArray[i - 1] = methods[expressionArray[i]](+expressionArray[i-1],+expressionArray[i+1]);
       expressionArray.splice(i,2);
       i--;
     }
   }
+
   if(expressionArray[0] === Infinity || isNaN(expressionArray[0])){
-    disabeledButtonsExeptClear();
+    disabeledButtonsExeptClearAndInputBar();
     return "Cannot divide by zero";
   }
-  expressionArray[0] = Number(expressionArray[0]).toFixed(2)
-  let result = expressionArray[0];
-  return parseFloat(result);
+  expressionArray[0] = parseFloat(Number(expressionArray[0]).toFixed(2));
+  return parseFloat(expressionArray[0]);
 }
 
-//Disable all buttons except the clear button.
-const disabeledButtonsExeptClear = () => {
+//Disable all buttons and the input bar except the clear button.
+const disabeledButtonsExeptClearAndInputBar = () => {
     for(let button of calculatorButtons){
       button.disabled = true;
     }
+    inputBar.readOnly = true;
     document.getElementById("clearbutton").disabled = false;
+}
+
+//Enable all buttons and the input bar.
+const enabeledAllButtonsAndInputBar = () => {
+  for(let button of calculatorButtons){
+    button.disabled = false;
+  }
+  inputBar.readOnly = false;
 }
 
 
