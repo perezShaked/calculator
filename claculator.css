@@ -3,6 +3,7 @@
   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   font-size: 26px;
   color: whitesmoke;
+  user-select: none;
 }
 
 
@@ -21,7 +22,7 @@
   justify-content: space-around;
 }
 
-.calculatorButton  {
+.calculatorButton{
   height: 2rem;
   width: 2rem;
   border-radius: 1rem;
@@ -30,7 +31,11 @@
   cursor: pointer;
 }
 
-.calculatorButton:hover {
+.calculatorButton:disabled{
+  color:rgba(245, 245, 245, 0.47);
+}
+
+.calculatorButton:hover:enabled {
   background-color: rgba(255, 255, 255, 0.573);
   color:rgba(69, 131, 172);
 }
@@ -39,7 +44,7 @@
   background-color: rgba(241, 106, 96, 0.87);
 }
 
-#equalButton:hover{
+#equalButton:hover:enabled{
   background-color: rgba(236, 141, 135, 0.87);
 }
 
@@ -63,12 +68,15 @@
 
 #showBar{
   width: 8.5rem;
-  height: 1rem;
+  height: 1.7rem;
   margin: 0;
   overflow-x:auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
+  overflow-y:none;
+  display: inline-block;
+  scrollbar-width:thin;
+  scrollbar-color:  rgba(24, 6, 6, 0.251) rgba(24, 6, 6, 0.345);
 }
+
 
 .operatorsButtons{
   background-color: rgba(24, 6, 6, 0.251);

@@ -1,10 +1,20 @@
-
-
 const showBar = document.getElementById("showBar");
 const inputBar = document.getElementById("inputBar");
 const notAlowedChars = /^[^0-9+\-/*\.]*$/;
 const calculatorButtons = document.getElementsByClassName("calculatorButton");
-let expressionArray = [];
+const plusOperator = '+';
+const minusOperator = '-';
+const divideOperator = '/';
+const multiOperator = '*';
+const operatoesArray = [plusOperator, minusOperator, divideOperator, multiOperator];
+const methods = {
+  [minusOperator]: (a, b) => a - b,
+  [plusOperator]: (a, b) => a + b,
+  [multiOperator]: (a, b) => a * b,
+  [divideOperator]: (a, b) => a / b,
+};
+const expressionArray = [];
+const calculateAssistingArray = [];
 let equalButtonClicked = false;
 
 /*React to the 'Escape' and 'Enter' key presses.
@@ -13,41 +23,49 @@ Enter - act like the equal cutton
 */
 document.addEventListener('keydown', (event) => {
   if(event.key === "Escape") {
-    clearButtonClick();
+    onClearButtonClick();
   }
+
   if(event.key === "Enter"){
-    equalButtonClick();
+    onEqualButtonClick();
   }
 });
 
 //React to clicks on the numbers buttons.
-const numberButtonClick = (buttenValue) => {
+const onNumberButtonClick = (buttenValue) => {
   if(equalButtonClicked){
-    clearButtonClick(); 
+    onClearButtonClick(); 
   }
+
   inputBar.value = inputBar.value + buttenValue;
   checkInputBar();
+  
+  if(inputBar.value >= Math.pow(2, 53)){
+    disabeledButtonsExeptClearAndInputBar();
+    inputBar.value = "Number too big";
+  }
 }
 
 //React to clicks on the clear button to reset the calculator.
-const clearButtonClick = () => {
-  expressionArray = [];
+const onClearButtonClick = () => {
+  expressionArray.length = 0;
   showBar.innerHTML = "";
   inputBar.value = "";
   equalButtonClicked = false;
-  enabeledAllButtonsAndInputBar();
+  enabledAllButtonsAndInputBar();
 }
 
 //React to clicks on the delete button.
-const deleteButtonClick = () => {
+const onDeleteButtonClick = () => {
   if(equalButtonClicked){
-    clearButtonClick(); 
+    onClearButtonClick(); 
   }
+
   inputBar.value = inputBar.value.slice(0, -1);
 }
 
 //Add the operator or point that the user clicks on.
-const operatorOrPointButtonClick = (innerHTML) => {
+const onOperatorOrPointButtonClick = (innerHTML) => {
   inputBar.value += innerHTML;
   checkInputBar();
 }
@@ -55,20 +73,20 @@ const operatorOrPointButtonClick = (innerHTML) => {
 //Check the value in the input bar after adding by the buttons or keyboard.
 const checkInputBar = () => {
   inputBar.value = inputBar.value.replace(notAlowedChars,"");
-  if(['+','-','*','/'].includes(inputBar.value.at(-1))){
-    operatorCharAdd(inputBar.value.at(-1));
+  if(operatoesArray.includes(inputBar.value.at(-1))){
+    addOperator(inputBar.value.at(-1));
   }else if(inputBar.value.at(-1) == "."){
-    pointCharAdd();
+    addPoint();
   }else if(inputBar.value.length >= 1 && !inputBar.value.includes(".")){
     inputBar.value = parseFloat(inputBar.value);
   }
 }
 
 //React to operators added by buttons or keyboard.
-const operatorCharAdd = (char) => {
+const addOperator = (operator) => {
   if(equalButtonClicked && inputBar.value.length !== 1){//Continue the expression with the result value.
-    expressionArray.push(char);
-    showBar.innerHTML = expressionArray[0] + char;
+    expressionArray.push(operator);
+    showBar.innerHTML = expressionArray[0] + operator;
     inputBar.value = "";
     equalButtonClicked = false;
   }else if(inputBar.value.length === 1){
@@ -77,92 +95,106 @@ const operatorCharAdd = (char) => {
     }else{//Replace the operator in the display bar with the one that is currently selected for addition.
       expressionArray.pop();
       expressionArray.push(inputBar.value);
-      showBar.innerHTML = showBar.innerHTML.slice(0, -1) + char;
+      showBar.innerHTML = showBar.innerHTML.slice(0, -1) + operator;
       inputBar.value = "";   
     }
-  }else{//Add the expressiono in the input bar to the display bar.
+  }else{//Add the expression in the input bar to the display bar.
     expressionArray.push(inputBar.value.slice(0, -1));
-    expressionArray.push(char);
+    expressionArray.push(operator);
     showBar.innerHTML += inputBar.value;
     inputBar.value = "";
   }
 }
 
 //React to point added by button or keyboard.
-const pointCharAdd = () => {
+const addPoint = () => {
   if(equalButtonClicked){
-    clearButtonClick(); 
+    onClearButtonClick(); 
   }
-  if(inputBar.value.slice(0,-1).includes(".") || inputBar.value.length === 1){
+
+  if(inputBar.value.slice(0,-1).includes(".")){
     inputBar.value = inputBar.value.slice(0, -1);
+  }
+
+  if(inputBar.value.length === 1){
+    inputBar.value = '0.';
   }
 }
 
 //React to clicks on the equal button or pressing enter.
-const equalButtonClick = () => {
+const onEqualButtonClick = () => {
   if(equalButtonClicked){
     return;
   }
+
   if(inputBar.value.length === 0){
     expressionArray.pop();
   }else{
     expressionArray.push(inputBar.value)
   }
+
   showBar.innerHTML = expressionArray.join("");
   inputBar.value = calculateExpression();
+  calculateAssistingArray.length = 0;
   equalButtonClicked = true;
 }
 
 //Calculate the mathematical expression.
 const calculateExpression = () => {
-  const methods = {
-    "-": (a, b) => a - b,
-    "+": (a, b) => a + b,
-    "*": (a, b) => a * b,
-    "/": (a, b) => a / b,
-  };
-
   if(expressionArray.length === 0){
     return "";
   }
+  
+  expressionArray.forEach((item, index) => {
+    if(item == divideOperator || item == multiOperator){
+      calculateAssistingArray.push(methods[item](+calculateAssistingArray.pop(), +expressionArray[index+1]));
+      expressionArray.splice(index,1);     
+    }else{
+      calculateAssistingArray.push(item);
+    }
+  })
 
-  for(let i = 0; i < expressionArray.length; i++){//calculate * and / 
-    if(expressionArray[i] == "/" || expressionArray[i] == "*"){
-      expressionArray[i - 1] = methods[expressionArray[i]](+expressionArray[i-1],+expressionArray[i+1]);
-      expressionArray.splice(i,2);
-      i--;
+  expressionArray.length = 0;
+  
+  calculateAssistingArray.forEach((item, index) => {
+    if(item == plusOperator || item == minusOperator){
+      expressionArray.push(methods[item](+expressionArray.pop(), +calculateAssistingArray[index+1]));
+      calculateAssistingArray.splice(index,1);  
+    }else{
+      expressionArray.push(item);
     }
-  }
-  for(let i = 0; i < expressionArray.length; i++){//calculate + and -
-    if(expressionArray[i] == "-" || expressionArray[i] == "+"){
-      expressionArray[i - 1] = methods[expressionArray[i]](+expressionArray[i-1],+expressionArray[i+1]);
-      expressionArray.splice(i,2);
-      i--;
-    }
-  }
+  })
 
   if(expressionArray[0] === Infinity || isNaN(expressionArray[0])){
     disabeledButtonsExeptClearAndInputBar();
     return "Cannot divide by zero";
   }
-  expressionArray[0] = parseFloat(Number(expressionArray[0]).toFixed(2));
-  return parseFloat(expressionArray[0]);
+
+  if(expressionArray[0] >= Math.pow(2, 53) || expressionArray[0] <= ((-1) * Math.pow(2, 53))){
+    disabeledButtonsExeptClearAndInputBar();
+    return "Number out of range";
+  }
+  
+  expressionArray[0] = parseFloat(Math.round(Number(expressionArray[0])*100)/100);
+  return expressionArray[0];
 }
 
 //Disable all buttons and the input bar except the clear button.
 const disabeledButtonsExeptClearAndInputBar = () => {
-    for(let button of calculatorButtons){
-      button.disabled = true;
-    }
-    inputBar.readOnly = true;
-    document.getElementById("clearbutton").disabled = false;
+  [...calculatorButtons].forEach(button => {
+    button.disabled = true;
+  });
+    
+  inputBar.readOnly = true;
+  document.getElementById("clearbutton").disabled = false;
 }
 
 //Enable all buttons and the input bar.
-const enabeledAllButtonsAndInputBar = () => {
-  for(let button of calculatorButtons){
+const enabledAllButtonsAndInputBar = () => {
+  [...calculatorButtons].forEach(button => {
     button.disabled = false;
-  }
+  });
+
   inputBar.readOnly = false;
 }
 
