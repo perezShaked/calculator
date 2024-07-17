@@ -1,20 +1,22 @@
-const showBar = document.getElementById("showBar");
-const inputBar = document.getElementById("inputBar");
-const notAlowedChars = /^[^0-9+\-/*\.]*$/;
-const calculatorButtons = document.getElementsByClassName("calculatorButton");
-const plusOperator = '+';
-const minusOperator = '-';
-const divideOperator = '/';
-const multiOperator = '*';
-const operatoesArray = [plusOperator, minusOperator, divideOperator, multiOperator];
-const methods = {
-  [minusOperator]: (a, b) => a - b,
-  [plusOperator]: (a, b) => a + b,
-  [multiOperator]: (a, b) => a * b,
-  [divideOperator]: (a, b) => a / b,
+const SHOW_BAR = document.getElementById("showBar");
+const INPUT_BAR = document.getElementById("inputBar");
+const NOT_ALLOWED_CHARS = /^[^0-9+\-/*\.]*$/;
+const CALCULATOR_BUTTONS = document.getElementsByClassName("calculatorButton");
+const PLUS_OPERATOR = '+';
+const MINUS_OPERATOR = '-';
+const DIVIDE_OPERATOR = '/';
+const MULTI_OPERATOR = '*';
+const OPERATORS = [PLUS_OPERATOR, MINUS_OPERATOR, DIVIDE_OPERATOR, MULTI_OPERATOR];
+const MAX_VALUE = Math.pow(2, 53);
+const MIN_VALUE = (-1) * Math.pow(2, 53);
+const METHODS = {
+  [MINUS_OPERATOR]: (a, b) => a - b,
+  [PLUS_OPERATOR]: (a, b) => a + b,
+  [MULTI_OPERATOR]: (a, b) => a * b,
+  [DIVIDE_OPERATOR]: (a, b) => a / b,
 };
-const expressionArray = [];
-const calculateAssistingArray = [];
+const EXPRESSION = [];
+const CALCULATE_ASSISTING = [];
 let equalButtonClicked = false;
 
 /*React to the 'Escape' and 'Enter' key presses.
@@ -37,22 +39,17 @@ const onNumberButtonClick = (buttenValue) => {
     onClearButtonClick(); 
   }
 
-  inputBar.value = inputBar.value + buttenValue;
+  INPUT_BAR.value = INPUT_BAR.value + buttenValue;
   checkInputBar();
-  
-  if(inputBar.value >= Math.pow(2, 53)){
-    disabeledButtonsExeptClearAndInputBar();
-    inputBar.value = "Number too big";
-  }
 }
 
 //React to clicks on the clear button to reset the calculator.
 const onClearButtonClick = () => {
-  expressionArray.length = 0;
-  showBar.innerHTML = "";
-  inputBar.value = "";
+  EXPRESSION.length = 0;
+  SHOW_BAR.innerHTML = "";
+  INPUT_BAR.value = "";
   equalButtonClicked = false;
-  enabledAllButtonsAndInputBar();
+  enableAllButtons();
 }
 
 //React to clicks on the delete button.
@@ -61,48 +58,53 @@ const onDeleteButtonClick = () => {
     onClearButtonClick(); 
   }
 
-  inputBar.value = inputBar.value.slice(0, -1);
+  INPUT_BAR.value = INPUT_BAR.value.slice(0, -1);
 }
 
 //Add the operator or point that the user clicks on.
 const onOperatorOrPointButtonClick = (innerHTML) => {
-  inputBar.value += innerHTML;
+  INPUT_BAR.value += innerHTML;
   checkInputBar();
 }
 
 //Check the value in the input bar after adding by the buttons or keyboard.
 const checkInputBar = () => {
-  inputBar.value = inputBar.value.replace(notAlowedChars,"");
-  if(operatoesArray.includes(inputBar.value.at(-1))){
-    addOperator(inputBar.value.at(-1));
-  }else if(inputBar.value.at(-1) == "."){
-    addPoint();
-  }else if(inputBar.value.length >= 1 && !inputBar.value.includes(".")){
-    inputBar.value = parseFloat(inputBar.value);
+  if(INPUT_BAR.value >= MAX_VALUE){
+    disabeleButtonsOnError();
+    INPUT_BAR.value = "Number too big";
+  }else{
+    INPUT_BAR.value = INPUT_BAR.value.replace(NOT_ALLOWED_CHARS,"");
+    if(OPERATORS.includes(INPUT_BAR.value.at(-1))){
+      addOperator(INPUT_BAR.value.at(-1));
+    }else if(INPUT_BAR.value.at(-1) == "."){
+      addPoint();
+    }else if(INPUT_BAR.value.length >= 1 && !INPUT_BAR.value.includes(".")){
+      INPUT_BAR.value = parseFloat(INPUT_BAR.value);
+    }
   }
 }
 
 //React to operators added by buttons or keyboard.
 const addOperator = (operator) => {
-  if(equalButtonClicked && inputBar.value.length !== 1){//Continue the expression with the result value.
-    expressionArray.push(operator);
-    showBar.innerHTML = expressionArray[0] + operator;
-    inputBar.value = "";
+  if(equalButtonClicked && INPUT_BAR.value.length !== 1){//Continue the expression with the result value.
+    EXPRESSION.push(operator);
+    SHOW_BAR.innerHTML = EXPRESSION[0] + operator;
+    INPUT_BAR.value = "";
     equalButtonClicked = false;
-  }else if(inputBar.value.length === 1){
-    if(showBar.innerHTML.length === 0){
-      inputBar.value = "";
+  }else if(INPUT_BAR.value.length === 1){
+    if(SHOW_BAR.innerHTML.length === 0){
+      INPUT_BAR.value = "";
     }else{//Replace the operator in the display bar with the one that is currently selected for addition.
-      expressionArray.pop();
-      expressionArray.push(inputBar.value);
-      showBar.innerHTML = showBar.innerHTML.slice(0, -1) + operator;
-      inputBar.value = "";   
+      EXPRESSION.pop();
+      EXPRESSION.push(INPUT_BAR.value);
+      SHOW_BAR.innerHTML = SHOW_BAR.innerHTML.slice(0, -1) + operator;
+      INPUT_BAR.value = "";   
     }
   }else{//Add the expression in the input bar to the display bar.
-    expressionArray.push(inputBar.value.slice(0, -1));
-    expressionArray.push(operator);
-    showBar.innerHTML += inputBar.value;
-    inputBar.value = "";
+    EXPRESSION.push(INPUT_BAR.value.slice(0, -1));
+    EXPRESSION.push(operator);
+    SHOW_BAR.innerHTML += INPUT_BAR.value;
+    INPUT_BAR.value = "";
   }
 }
 
@@ -112,12 +114,12 @@ const addPoint = () => {
     onClearButtonClick(); 
   }
 
-  if(inputBar.value.slice(0,-1).includes(".")){
-    inputBar.value = inputBar.value.slice(0, -1);
+  if(INPUT_BAR.value.slice(0,-1).includes(".")){
+    INPUT_BAR.value = INPUT_BAR.value.slice(0, -1);
   }
 
-  if(inputBar.value.length === 1){
-    inputBar.value = '0.';
+  if(INPUT_BAR.value.length === 1){
+    INPUT_BAR.value = '0.';
   }
 }
 
@@ -127,75 +129,81 @@ const onEqualButtonClick = () => {
     return;
   }
 
-  if(inputBar.value.length === 0){
-    expressionArray.pop();
+  if(INPUT_BAR.value.length === 0){
+    EXPRESSION.pop();
   }else{
-    expressionArray.push(inputBar.value)
+    EXPRESSION.push(INPUT_BAR.value)
   }
 
-  showBar.innerHTML = expressionArray.join("");
-  inputBar.value = calculateExpression();
-  calculateAssistingArray.length = 0;
+  SHOW_BAR.innerHTML = EXPRESSION.join("");
+  INPUT_BAR.value = calculateExpression();
+  CALCULATE_ASSISTING.length = 0;
   equalButtonClicked = true;
 }
 
 //Calculate the mathematical expression.
 const calculateExpression = () => {
-  if(expressionArray.length === 0){
+  if(EXPRESSION.length === 0){
     return "";
   }
-  
-  expressionArray.forEach((item, index) => {
-    if(item == divideOperator || item == multiOperator){
-      calculateAssistingArray.push(methods[item](+calculateAssistingArray.pop(), +expressionArray[index+1]));
-      expressionArray.splice(index,1);     
+
+  let skipNext = false;
+
+  EXPRESSION.forEach((item, index) => {
+    if(skipNext){
+      skipNext = false;
+    }else if(item == DIVIDE_OPERATOR || item == MULTI_OPERATOR){
+      CALCULATE_ASSISTING.push(METHODS[item](+CALCULATE_ASSISTING.pop(), +EXPRESSION[index+1]));
+      skipNext = true;    
     }else{
-      calculateAssistingArray.push(item);
+      CALCULATE_ASSISTING.push(item);
     }
   })
 
-  expressionArray.length = 0;
+  EXPRESSION.length = 0;
   
-  calculateAssistingArray.forEach((item, index) => {
-    if(item == plusOperator || item == minusOperator){
-      expressionArray.push(methods[item](+expressionArray.pop(), +calculateAssistingArray[index+1]));
-      calculateAssistingArray.splice(index,1);  
+  CALCULATE_ASSISTING.forEach((item, index) => {
+    if(skipNext){
+      skipNext = false;
+    }else if(item == PLUS_OPERATOR || item == MINUS_OPERATOR){
+      EXPRESSION.push(METHODS[item](+EXPRESSION.pop(), +CALCULATE_ASSISTING[index+1]));
+      skipNext = true; 
     }else{
-      expressionArray.push(item);
+      EXPRESSION.push(item);
     }
   })
 
-  if(expressionArray[0] === Infinity || isNaN(expressionArray[0])){
-    disabeledButtonsExeptClearAndInputBar();
+  if(EXPRESSION[0] === Infinity || isNaN(EXPRESSION[0])){
+    disabeleButtonsOnError();
     return "Cannot divide by zero";
   }
 
-  if(expressionArray[0] >= Math.pow(2, 53) || expressionArray[0] <= ((-1) * Math.pow(2, 53))){
-    disabeledButtonsExeptClearAndInputBar();
+  if(EXPRESSION[0] >= MAX_VALUE || EXPRESSION[0] <= (MIN_VALUE)){
+    disabeleButtonsOnError();
     return "Number out of range";
   }
-  
-  expressionArray[0] = parseFloat(Math.round(Number(expressionArray[0])*100)/100);
-  return expressionArray[0];
+
+  EXPRESSION[0] = parseFloat(Math.round(Number(EXPRESSION[0])*100)/100);
+  return EXPRESSION[0];
 }
 
 //Disable all buttons and the input bar except the clear button.
-const disabeledButtonsExeptClearAndInputBar = () => {
-  [...calculatorButtons].forEach(button => {
+const disabeleButtonsOnError = () => {
+  [...CALCULATOR_BUTTONS].forEach(button => {
     button.disabled = true;
   });
     
-  inputBar.readOnly = true;
+  INPUT_BAR.readOnly = true;
   document.getElementById("clearbutton").disabled = false;
 }
 
 //Enable all buttons and the input bar.
-const enabledAllButtonsAndInputBar = () => {
-  [...calculatorButtons].forEach(button => {
+const enableAllButtons = () => {
+  [...CALCULATOR_BUTTONS].forEach(button => {
     button.disabled = false;
   });
 
-  inputBar.readOnly = false;
+  INPUT_BAR.readOnly = false;
 }
 
 
